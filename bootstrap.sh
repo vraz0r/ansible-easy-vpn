@@ -162,7 +162,10 @@ export PATH="$ANSIBLE_DIR/.venv/bin:$PATH"
 "$ANSIBLE_DIR/.venv/bin/python3" -m pip install -r "$ANSIBLE_DIR/requirements.txt"
 
 # Install the Galaxy requirements
-ansible-galaxy install --force -r "$ANSIBLE_DIR/requirements.yml"
+# Must run from ANSIBLE_DIR so ansible.cfg is picked up and roles land in .ansible/roles
+pushd "$ANSIBLE_DIR" > /dev/null
+ansible-galaxy install --force -r requirements.yml
+popd > /dev/null
 
 # Check if we're running on an AWS EC2 instance
 aws=false
