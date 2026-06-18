@@ -8,6 +8,8 @@
     image: "containrrr/watchtower"
     pull: yes
     state: "started"
+    env:
+      DOCKER_API_VERSION: "1.41"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     restart_policy: unless-stopped
