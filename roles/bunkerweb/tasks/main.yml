@@ -48,6 +48,25 @@
       - "443:8443/udp"
     restart_policy: unless-stopped
 
+- name: Create BunkerWeb custom configs directories for auth-protected hosts
+  ansible.builtin.file:
+    path: "{{ docker_dir }}/bunkerweb/configs/server-http/{{ item }}"
+    state: directory
+    owner: "101"
+    group: "101"
+    mode: 0755
+  loop: "{{ [wireguard_host] + ([adguard_host] if enable_adguard_unbound_doh else []) }}"
+
+- name: Deploy Authelia auth_request location fix for auth-protected hosts
+  ansible.builtin.template:
+    src: authelia-fix.conf.j2
+    dest: "{{ docker_dir }}/bunkerweb/configs/server-http/{{ item }}/authelia-fix.conf"
+    owner: "101"
+    group: "101"
+    mode: 0644
+  loop: "{{ [wireguard_host] + ([adguard_host] if enable_adguard_unbound_doh else []) }}"
+  notify: Restart bw-scheduler
+
 - name: Make sure the BunkerWeb scheduler container is created and running
   register: bw_scheduler_result
   retries: 5

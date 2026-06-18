@@ -1,0 +1,11 @@
+location = /authelia {
+    set $authelia_backend "http://authelia:9091/api/verify";
+    proxy_pass $authelia_backend;
+    proxy_pass_request_body off;
+    proxy_set_header Content-Length "";
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Original-URL $scheme://$host$request_uri;
+    proxy_buffers 4 32k;
+    proxy_buffer_size 64k;
+}
