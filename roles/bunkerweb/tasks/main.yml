@@ -1,28 +1,33 @@
 ---
-- name: Create the folders
+- name: Create the bw-universe network for scheduler-to-bunkerweb API
+  community.docker.docker_network:
+    name: bw_universe
+    ipam_config:
+      - subnet: "10.8.3.0/24"
+        gateway: "10.8.3.1"
+
+- name: Create bunkerweb directory
   ansible.builtin.file:
-    path: "{{ docker_dir }}/{{ item }}"
+    path: "{{ docker_dir }}/bunkerweb"
     state: directory
     owner: root
-    group: 101
-    mode: 0770
-  loop:
-    - bunkerweb/
-    - bunkerweb/data
+    group: root
+    mode: 0755
 
-- name: Copy the env file
+- name: Copy scheduler env file
   ansible.builtin.template:
     src: env.j2
+    dest: "{{ docker_dir }}/bunkerweb/scheduler.env"
     owner: root
-    group: 101
-    mode: 0644
-    dest: "{{ docker_dir }}/bunkerweb/.env"
+    group: root
+    mode: 0640
+  notify: Restart bw-scheduler
 
-- name: Make sure the Bunkerweb container is created and running
+- name: Make sure the BunkerWeb container is created and running
   register: bunkerweb_result
   retries: 5
   until: bunkerweb_result is succeeded
-  community.general.docker_container:
+  community.docker.docker_container:
     name: "bunkerweb"
     image: "bunkerity/bunkerweb:{{ bunkerweb_version }}"
     healthcheck:
@@ -31,13 +36,34 @@
     networks:
       - name: wg_network
         ipv4_address: 10.8.2.5
+      - name: bw_universe
+        ipv4_address: 10.8.3.2
     pull: yes
     state: "started"
-    env_file: "{{ docker_dir }}/bunkerweb/.env"
+    env:
+      API_HTTP_PORT: "5000"
+      API_LISTEN_IP: "0.0.0.0"
+      API_SERVER_NAME: "bwapi"
+      API_WHITELIST_IP: "127.0.0.1 10.8.3.0/24"
     ports:
-      - "80:80"
-      - "443:443"
+      - "80:8080"
+      - "443:8443/tcp"
+      - "443:8443/udp"
+    restart_policy: unless-stopped
+
+- name: Make sure the BunkerWeb scheduler container is created and running
+  register: bw_scheduler_result
+  retries: 5
+  until: bw_scheduler_result is succeeded
+  community.docker.docker_container:
+    name: "bw-scheduler"
+    image: "bunkerity/bunkerweb-scheduler:{{ bunkerweb_version }}"
+    networks:
+      - name: bw_universe
+        ipv4_address: 10.8.3.3
+    pull: yes
+    state: "started"
+    env_file: "{{ docker_dir }}/bunkerweb/scheduler.env"
     volumes:
-      - "{{ docker_dir }}/bunkerweb/data:/data"
-      - "/lib/modules:/lib/modules"
+      - "{{ docker_dir }}/bunkerweb:/data"
     restart_policy: unless-stopped

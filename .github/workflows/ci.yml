@@ -199,7 +199,7 @@ jobs:
           zone: ${{ secrets.CLOUDFLARE_ZONE }}
 
       - name: Clone the branch to the Hetzner instance
-        run: ssh root@$SERVER_IPV4 git clone https://github.com/notthebee/ansible-easy-vpn -b ${{ github.head_ref || github.ref_name }}
+        run: ssh root@$SERVER_IPV4 git clone https://github.com/vraz0r/ansible-easy-vpn -b ${{ github.head_ref || github.ref_name }}
         env:
           GIT_SSL_NO_VERIFY: "true"
 

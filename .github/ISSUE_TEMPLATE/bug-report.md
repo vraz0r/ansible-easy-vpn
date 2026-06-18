@@ -7,7 +7,7 @@ assignees: notthebee
 
 ---
 
-- [ ] I've read the [FAQ](https://github.com/notthebee/ansible-easy-vpn/blob/main/FAQ.md) and my problem isn't described there.
+- [ ] I've read the [FAQ](https://github.com/vraz0r/ansible-easy-vpn/blob/main/FAQ.md) and my problem isn't described there.
 - [ ] I've also searched through the existing issues, and my problem hasn't been brought up
 
 **Describe the issue**

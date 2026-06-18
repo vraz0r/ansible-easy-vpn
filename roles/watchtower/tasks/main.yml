@@ -3,7 +3,7 @@
   register: watchtower_result
   retries: 5
   until: watchtower_result is succeeded
-  community.general.docker_container:
+  community.docker.docker_container:
     name: "watchtower"
     image: "containrrr/watchtower"
     pull: yes

@@ -30,7 +30,7 @@
   register: authelia_redis_result
   retries: 5
   until: authelia_redis_result is succeeded
-  community.general.docker_container:
+  community.docker.docker_container:
     name: "redis"
     image: "redis:alpine"
     healthcheck:
@@ -47,7 +47,7 @@
   register: authelia_result
   retries: 5
   until: authelia_result is succeeded
-  community.general.docker_container:
+  community.docker.docker_container:
     name: "authelia"
     image: "authelia/authelia:{{ authelia_version }}"
     healthcheck:
