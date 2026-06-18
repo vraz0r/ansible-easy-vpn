@@ -58,7 +58,7 @@
 
           2. Type the following commands:
           cd
-          scp -P 22 root@{{ ipify_public_ip }}:/tmp/id_ssh_ed25519 .ssh/id_vpn_{{ username }}
+          scp -P 22 root@{{ ipify_public_ip }}:/root/id_ssh_ed25519 .ssh/id_vpn_{{ username }}
 
           3. Test the SSH key by typing this command:
           ssh -p 22 {{ username }}@{{ ipify_public_ip }} -i .ssh/id_vpn_{{ username }}
